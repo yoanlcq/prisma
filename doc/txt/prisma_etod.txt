@@ -1,0 +1,115 @@
+prisma_etod(3)							prisma_etod(3)
+
+
+
+NAME
+       prisma_etod - Escape Sequence to Data
+
+SYNOPSIS
+       #include <prisma.h>
+
+       struct  PrismaEscapeData  prisma_etod(const  void*  src_string,	size_t
+       char_size);
+       struct PrismaEscapeData prismas_etod(const char* src_string);
+
+DESCRIPTION
+       prisma_dtoe() interprets an escape sequence, using a character  storage
+       size  of char_size, and returns the result in an easy to process struc‐
+       ture.
+
+       prismas_etod(src_string)  is  equivalent   to   prisma_etod(src_string,
+       sizeof(char)).
+
+       prisma defines a structure to abstract an escape sequence's meaning and
+       data as follows :
+
+       struct PrismaEscapeData {
+	   int32_t value;  /* The escape sequence's meaning */
+	   uint8_t r;	   /* Optional red value */
+	   uint8_t g;	   /* Optional green value */
+	   uint8_t b;	   /* Optional blue value */
+	   int16_t n;	   /* Optional first informative value */
+	   int16_t m;	   /* Optional second informative value */
+	   uint8_t length; /* The escape sequence's total length as a string */
+       };
+
+       prisma_dtoe() fills the value field, and then, depending on it (and the
+       escape sequence itself), fill other fields.
+
+       Basically,  one	should	refer to prisma.h to get an exhaustive list of
+       the possible macros that PrismaEscapeData's value field can carry.
+
+       The optional r, g, and b fields are filled ONLY when relevant (i.e when
+       the value field is PRISMA__BG_EXTENDED of PRISMA__FG_EXTENDED).
+       The  optional n and m fields are filled if the escape sequence needs to
+       store information unrelated to color (like x and y coordinates, respec‐
+       tively, with PRISMA__CURSOR_POSITION).
+
+RETURN VALUE
+       A properly filled PrismaEscapeData structure.
+
+ERRORS
+       If  src_string  is  not	an escape sequence, or an unsupported one, the
+       returned structure's value field is set to PRISMA__UNSUPPORTED.
+       Note that it doesn't matter whether there are  extra  characters  after
+       the escape sequence.
+       prisma_etod()  stops after the escape sequence's final character or the
+       NULL character.
+
+EXAMPLE
+       #include <stdlib.h>
+       #include <stdio.h>
+       #include <wchar.h>
+       #include <prisma.h>
+
+       #define CHAR_TYPE int /* Let's use wide strings, it's not funny otherwise. */
+       #define LENGTH 256
+
+       void process_message(const CHAR_TYPE *str);
+
+       int main(void) {
+	   CHAR_TYPE message[LENGTH] = L"Hello, this is \033[31mred\033[m !\n";
+	   CHAR_TYPE message_ex[LENGTH] = L"Hello, this is \033[38;2;255;0;0mextended red\033[m !\n";
+	   process_message(message);
+	   printf("\n--\n\n");
+	   process_message(message_ex);
+	   exit(EXIT_SUCCESS);
+       }
+
+       void process_message(const CHAR_TYPE *str) {
+	   struct PrismaEscapeData data;
+	   unsigned i;
+	   for(i=0 ; str[i] != '\0' ; i += (data.length==0 ? 1 : data.length)) {
+	       data = prisma_etod(str+i, sizeof(CHAR_TYPE));
+	       switch(data.value) {
+	       case PRISMA__UNSUPPORTED:
+		   putchar(str[i]);
+	       break;
+	       case PRISMA__RESET:
+		   printf("\n(the following is reset, do something)\n");
+	       break;
+	       case PRISMA__FG_RED:
+		   printf("\n(the following is red, do something)\n");
+	       break;
+	       case PRISMA__FG_EXTENDED:
+		   printf("\n(the following is rgb(%u, %u, %u), do something)\n", data.r, data.g, data.b);
+	       break;
+	       }
+	   }
+       }
+
+BUGS
+       Bug reports should be sent to yoanlecoq.io@gmail.com.
+
+COPYRIGHT
+       prisma is released under the CC0 license.
+       (see http://creativecommons.org/about/cc0)
+       Anyone may freely build upon, enhance and reuse prisma for any purposes
+       without restriction under copyright or database law.
+
+SEE ALSO
+       prisma_etod(3)
+
+
+
+				  2014-12-25			prisma_etod(3)

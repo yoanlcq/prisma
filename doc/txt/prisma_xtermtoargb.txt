@@ -1,0 +1,61 @@
+prisma_argbtoxterm(3)					 prisma_argbtoxterm(3)
+
+
+
+NAME
+       prisma_xtermtoargb  -  get  a True-Color ARGB value from an Xterm Color
+       Index.
+       prisma_argbtoxterm - get an Xterm Color Index from  a  True-Color  ARGB
+       value.
+
+SYNOPSIS
+       #include <prisma.h>
+
+       uint8_t prisma_argbtoxterm(uint32_t argb);
+       uint32_t prisma_xtermtoargb(uint8_t index);
+
+DESCRIPTION
+       Xterm,  one  of	the  most  common  Linux  terminal emulators, supports
+       extended ANSI Escape Sequences for coloured output, which  refer  to  a
+       256-color chart.
+       This chart allows up to 216 RGB colors, 24 shades of grey, a decreased-
+       intensity 8-color set and a high-intensity 8-color set.
+       prisma refers to an Xterm Color Index as an unsigned byte, indicating a
+       value in the Xterm Color Chart.
+
+RETURN VALUE
+       prisma_argbtoxterm() returns the closest Xterm Color Index value match‐
+       ing argb (ignoring its Alpha), conforming to the Xterm Color Chart.
+       prisma_xtermtoargb() returns index as a True-Color ARGB value.
+
+EXAMPLE
+       #include <stdlib.h>
+       #include <stdint.h>
+       #include <stdio.h>
+       #include <prisma.h>
+
+       int main(void) {
+	   uint32_t my_color = 0xffff42ff;
+	   printf("#%.8x approximates to #%.8x as an Xterm Color (of index %u).\n",
+		   my_color,
+		   prisma_xtermtoargb(prisma_argbtoxterm(my_color)),
+		   prisma_argbtoxterm(my_color));
+	   exit(EXIT_SUCCESS);
+       }
+
+BUGS
+       Bug reports should be sent to yoanlecoq.io@gmail.com.
+
+COPYRIGHT
+       prisma is released under the CC0 license.
+       (see http://creativecommons.org/about/cc0)
+       Anyone may freely build upon, enhance and reuse prisma for any purposes
+       without restriction under copyright or database law.
+
+SEE ALSO
+       prisma_argbto8color(3), prisma_8colortoargb(3)
+
+
+
+
+				  2014-12-25		 prisma_argbtoxterm(3)

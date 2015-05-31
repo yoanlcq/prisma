@@ -1,0 +1,74 @@
+prisma(7)							     prisma(7)
+
+
+
+DESCRIPTION
+       prisma is a small C/C++ library, which allows easy ANSI escape sequence
+       generation and interpretation.
+       Moreover, it provides some funny functions to play with colors.
+       This is prisma 1.0.0. In this  version,	prisma	supports  only	Select
+       Graphics Rendition (SGR) ANSI escape sequences.
+
+       It  is NOT destined to text-based user interfaces. For this, one should
+       rather use ncurses.
+
+       However, prisma can adapt the ANSI escape  sequences  it  generates  to
+       Xterm, Linux TTY, and fake their behaviour on Window's cmd.exe.
+
+       prisma's  main purpose is to be used in small applications that need to
+       store extra informations inside of strings, that should not  be	inter‐
+       preted  as  text  (for  instance,  storing  a text along with its color
+       within a single string).
+
+       Applications that would make a great use of prisma would be small  chat
+       widgets,  in-game  command-lines,  informative  loading screens and the
+       like.
+
+GENERAL USE
+       All of prisma's constants and  functions  are  prefixed,  respectively,
+       with  'PRISMA__'  and  'prisma_'. Those starting with '_' are meant for
+       internal use only.  Some of prisma's functions come with a shorter ver‐
+       sion, prefixed by 'prismas_' (note the 's' at the end).
+
+       Depending  on  what you wish to do, here is where to get started. Exam‐
+       ples are given in each of prisma's manual pages.
+
+       Generate escape sequences :
+       prisma_dtoe(3)
+
+       Interpret escape sequences :
+       prisma_etod(3)
+
+       Adapt prisma's output to a specific terminal :
+       prisma_adapt(3)
+
+       Play with colors :
+       prisma_bytestoargb(3)
+       prisma_argbtobytes(3)
+       prisma_gradient(3)
+       prisma_xtermtoargb(3)
+       prisma_argbtoxterm(3)
+       prisma_8colortoargb(3)
+       prisma_argbto8color(3)
+
+NOTES
+       prisma originated as a BASH script printing a  given  text  in  rainbow
+       colors.	It  would  work  properly  only on Xterm, and the RGB-to-xterm
+       color conversion algorithm was empiric and insane. Today, prisma  makes
+       writing such a program far easier.
+
+BUGS
+       prisma_adapt(3) Bug reports should be sent to yoanlecoq.io@gmail.com.
+
+COPYRIGHT
+       prisma is released under the CC0 license.
+       (see http://creativecommons.org/about/cc0)
+       Anyone may freely build upon, enhance and reuse prisma for any purposes
+       without restriction under copyright or database law.
+
+SEE ALSO
+       prisma_dtoe(3), prisma_etod(3), prisma_adapt(3), prisma_gradient(3)
+
+
+
+				  2014-12-25			     prisma(7)

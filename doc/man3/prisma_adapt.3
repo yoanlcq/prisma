@@ -1,0 +1,81 @@
+.TH prisma_adapt 3 2014-12-25
+.SH NAME
+prisma_adapt \- adapt prisma's generated escape sequences for printing on a terminal.
+.SH SYNOPSIS
+.B #include <prisma.h>
+.PP
+.B int8_t prisma_adapt(int8_t \fIadaptation\fB);
+.SH DESCRIPTION
+A call to 
+.B prisma_adapt()
+sets prisma's current output adaptation, depending on \fIadaptation\fR which may be one of the following constants :
+.PP
+.B PRISMA__ADAPT__FULLSUPPORT
+.br
+prisma produces escape sequences that can store the highest level of detail. Some may not be supported by terminals.
+.br
+This is prisma's default adaptation, that you should use for your own graphical applications.
+.PP
+.B PRISMA__ADAPT__NOSUPPORT
+.br
+prisma produces empty strings instead of escape sequences.
+.PP
+.B PRISMA__ADAPT__XTERM
+.br
+prisma produces escape sequences that Xterm understands.
+.PP
+.B PRISMA__ADAPT__LINUXTTY
+.br
+prisma produces escape sequences that Linux TTY understands.
+.PP
+.B PRISMA__ADAPT__CMD
+.br
+prisma produces empty strings instead of escape sequences. However, after a call to 
+.BR prisma_dtoe (3)
+, some WinAPI functions may be called to alter the command line in the expected way.
+.br
+To know more, see
+.BR prisma_dtoe (3).
+.PP
+.B PRISMA__ADAPT__GUESS
+.br
+prisma tries to guess the adaptation that would suit the current user's terminal. But since there is not a fully reliable way to do this, one should use it with care. See below.
+.SH RETURN VALUE
+The adaptation that prisma actually used. Especially when using 
+.B PRISMA__ADAPT__GUESS
+you're strongly invited to check this value, to prevent unexpected behaviours.
+.br
+Chances are prisma doesn't support or recognize your terminal at runtime. In this case, it would adapt to PRISMA__ADAPT__NOSUPPORT.
+.SH ERRORS
+.B prisma_adapt()
+returns 
+.B PRISMA__ADAPT__NOSUPPORT
+if anything went wrong.
+.SH EXAMPLE
+.nf
+#include <stdlib.h>
+#include <stdio.h>
+#include <prisma.h>
+
+int main(void) {
+    struct PrismaEscapeData green, reset;
+    if(prisma_adapt(PRISMA__ADAPT__GUESS) != PRISMA__ADAPT__NOSUPPORT) {
+        green.value = PRISMA__FG_GREEN;
+        reset.value = PRISMA__RESET;
+        printf("prisma supports your terminal !\\n");
+        printf("%sThere, have a green text !", prismas_dtoe(green));
+        printf("%s\\n", prismas_dtoe(reset));
+    } else {
+        fprintf(stderr, "prisma doesn't support your terminal.\\n");
+    }
+    exit(EXIT_SUCCESS);
+}
+.fi
+.SH BUGS
+Bug reports should be sent to yoanlecoq.io@gmail.com.
+.SH COPYRIGHT
+prisma is released under the CC0 license.
+.br
+(see http://creativecommons.org/about/cc0)
+.br
+Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.

@@ -1,0 +1,50 @@
+.TH prisma_argbtobytes 3 2014-12-25
+.SH NAME
+prisma_bytestoargb \- get a True-Color ARGB value from individual alpha, red, green and blue bytes.
+.br
+prisma_argbtobytes \- split a True-Color ARGB value into individual alpha, red, green and blue bytes.
+.SH SYNOPSIS
+.B #include <prisma.h>
+.PP
+.B uint32_t prisma_bytestoargb(uint8_t \fIa\fB, uint8_t \fIr\fB, uint8_t \fIg\fB, uint8_t \fIb\fB);
+.br
+.B void prisma_argbtobytes(uint32_t \fIargb\fB, uint8_t *\fIa\fB, uint8_t *\fIr\fB, uint8_t *\fIg\fB, uint8_t *\fIb\fB);
+.SH DESCRIPTION
+.B prisma_bytestoargb()
+returns a 32-bit integer storing a True-Color ARGB value from Alpha, Red, Green and Blue bytes, respectively \fIa\fR, \fIr\fR, \fIg\fR and \fIb\fR.
+.br
+.B prisma_argbtobytes()
+stores the True-Color ARGB 32-bit integer \fIargb\fR's Alpha, Red, Green and Blue components in the bytes pointed to by, respectiveley, \fIa\fR, \fIr\fR, \fIg\fR and \fIb\fR. Any or several of them can be NULL, causing them to be ignored.
+.SH EXAMPLE
+.nf
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <prisma.h>
+
+int main(void) {
+    uint8_t a, r, g, b;
+    uint32_t magenta = 0xffff00ff;
+    uint32_t cyan = prisma_bytestoargb(255, 0, 255, 255);
+    
+    prisma_argbtobytes(magenta, &a, &r, &b, &g);
+    printf("#%.8x is argb(%u,%u,%u,%u).\\n", magenta, a, r, g, b);
+
+    prisma_argbtobytes(cyan, &a, &r, &b, &g);
+    printf("#%.8x is argb(%u,%u,%u,%u).\\n", cyan, a, r, g, b);
+    exit(EXIT_SUCCESS);
+}
+.fi
+.SH BUGS
+Bug reports should be sent to yoanlecoq.io@gmail.com.
+.SH COPYRIGHT
+prisma is released under the CC0 license.
+.br
+(see http://creativecommons.org/about/cc0)
+.br
+Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.
+.SH SEE ALSO
+.BR prisma_argbto8color (3),
+.BR prisma_8colortoargb (3),
+.BR prisma_argbtoxterm (3)
+.BR prisma_xtermtoargb (3),

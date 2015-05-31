@@ -1,0 +1,53 @@
+.TH prisma_gradient 3 2014-12-25
+.SH NAME
+prisma_gradient \- get a True-Color ARGB array containing a gradient.
+.SH SYNOPSIS
+.B #include <prisma.h>
+.sp
+.B const uint32_t* prisma_gradient(uint8_t \fIresolution\fB, uint32_t \fIargb_first\fB, uint32_t \fIargb_last\fB);
+.sp
+.SH DESCRIPTION
+.B prisma_gradient()
+returns an array of colors, containing the transition between \fIargb_first\fR and \fIargb_last\fR, in \fIresolution\fR steps (aka shades).
+.br
+\fIargb_first\fR and \fIargb_last\fR are always included in the array.
+.br
+Since a static array is used, another call to
+.B prisma_gradient()
+invalidates any previous result.
+.SH RETURN VALUE
+.B prisma_gradient()
+always returns a True-Color ARGB array of capacity 256 (the maximum size of an ARGB's single channel, an unsigned byte).
+.br
+The array's unused slots (i.e beyond the one at \fIresolution\fR\-1) are set to 0, which also means they hold a transparent black color.
+.SH EXAMPLE
+.nf
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <prisma.h>
+
+
+int main(void) {
+    const uint32_t *gradient;
+    uint8_t i, a, r, g, b, resolution;
+
+    /* We're making 4 steps from a transparent red to an opaque blue. */
+    resolution = 4;
+    gradient = prisma_gradient(resolution, 0x00ff0000, 0xff0000ff);
+
+    for(i=0 ; i<resolution ; i++) {
+        prisma_argbtobytes(gradient[i], &a, &r, &g, &b);
+        printf("#%.8x (rgb(%u,%u,%u), alpha %u%%)\\n", gradient[i], r, g, b, a*100/255);
+    }
+    exit(EXIT_SUCCESS);
+}
+.fi
+.SH BUGS
+Bug reports should be sent to yoanlecoq.io@gmail.com.
+.SH COPYRIGHT
+prisma is released under the CC0 license.
+.br
+(see http://creativecommons.org/about/cc0)
+.br
+Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.

@@ -1,0 +1,64 @@
+.TH prisma 7 2014-12-25
+.SH DESCRIPTION
+prisma is a small C/C++ library, which allows easy ANSI escape sequence generation and interpretation.
+.br
+Moreover, it provides some funny functions to play with colors.
+.br
+This is prisma 1.0.0. In this version, prisma supports only Select Graphics Rendition (SGR) ANSI escape sequences. 
+.PP
+It is NOT destined to text-based user interfaces. For this, one should rather use ncurses.
+.PP 
+However, prisma can adapt the ANSI escape sequences it generates to Xterm, Linux TTY, and fake their behaviour on Window's cmd.exe.
+.PP
+prisma's main purpose is to be used in small applications that need to store extra informations inside of strings, that should not be interpreted as text (for instance, storing a text along with its color within a single string).
+.PP
+Applications that would make a great use of prisma would be small chat widgets, in-game command-lines, informative loading screens and the like.
+.SH GENERAL USE
+All of prisma's constants and functions are prefixed, respectively, with 'PRISMA__' and 'prisma_'. Those starting with '_' are meant for internal use only.
+Some of prisma's functions come with a shorter version, prefixed by 'prismas_' (note the 's' at the end).
+.PP
+Depending on what you wish to do, here is where to get started. Examples are given in each of prisma's manual pages.
+.PP
+Generate escape sequences :
+.br
+.BR prisma_dtoe (3)
+.PP
+Interpret escape sequences :
+.br
+.BR prisma_etod (3)
+.PP
+Adapt prisma's output to a specific terminal :
+.br
+.BR prisma_adapt (3)
+.PP
+Play with colors :
+.br
+.BR prisma_bytestoargb (3)
+.br
+.BR prisma_argbtobytes (3)
+.br
+.BR prisma_gradient (3)
+.br
+.BR prisma_xtermtoargb (3)
+.br
+.BR prisma_argbtoxterm (3)
+.br
+.BR prisma_8colortoargb (3)
+.br
+.BR prisma_argbto8color (3)
+.SH NOTES
+prisma originated as a BASH script printing a given text in rainbow colors. It would work properly only on Xterm, and the RGB-to-xterm color conversion algorithm was empiric and insane. Today, prisma makes writing such a program far easier.
+.SH BUGS
+.BR prisma_adapt (3)
+Bug reports should be sent to yoanlecoq.io@gmail.com.
+.SH COPYRIGHT
+prisma is released under the CC0 license.
+.br
+(see http://creativecommons.org/about/cc0)
+.br
+Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.
+.SH SEE ALSO
+.BR prisma_dtoe (3),
+.BR prisma_etod (3),
+.BR prisma_adapt (3),
+.BR prisma_gradient (3)

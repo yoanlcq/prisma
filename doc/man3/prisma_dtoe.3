@@ -1,0 +1,110 @@
+.TH prisma_dtoe 3 2014-12-25
+.SH NAME
+prisma_dtoe \- Data to Escape Sequence
+.SH SYNOPSIS
+.B #include <prisma.h>
+.PP
+.B const void* prisma_dtoe(struct PrismaEscapeData \fIsrc\fB, size_t \fIchar_size\fB);
+.br
+.B const char* prismas_dtoe(struct PrismaEscapeData \fIsrc\fB);
+.SH DESCRIPTION
+.B prisma_dtoe()
+generates an escape sequence, using a character storage size of \fIchar_size\fR, and of maximum capacity PRISMA_ESCAPE_CAPACITY. Escape sequences can be interpreted with
+.BR prisma_etod(3).
+.PP
+.B prismas_dtoe(\fIsrc\fR)
+is equivalent to
+.B prisma_dtoe(\fIsrc\fR, sizeof(char)).
+.PP
+prisma defines a structure to abstract an escape sequence's meaning and data as follows :
+.nf
+
+struct PrismaEscapeData {
+    int32_t value;  /* The escape sequence's meaning */
+    uint8_t r;      /* Optional red value */
+    uint8_t g;      /* Optional green value */
+    uint8_t b;      /* Optional blue value */
+    int16_t n;      /* Optional first informative value */
+    int16_t m;      /* Optional second informative value */
+    uint8_t length; /* The escape sequence's total length as a string */
+};
+
+.fi
+.B prisma_dtoe()
+refers to \fIsrc\fR's value field, and then, depending on it, take information from other fields (except the length field, filled only by 
+.B prisma_etod(3)
+).
+.PP
+Basically, one should refer to prisma.h to get an exhaustive list of the possible macros usable for a PrismaEscapeData's value field.
+.PP
+The optional r, g, and b fields are checked ONLY when relevant (i.e when \fIsrc\fR's value field is PRISMA__BG_EXTENDED of PRISMA__FG_EXTENDED).
+.br
+The optional n and m fields are reserved for escape sequences that need to store information unrelated to color (like x and y coordinates, respectively, with PRISMA__CURSOR_POSITION).
+.SH GOOD PRACTICES
+.B prisma_dtoe()
+is meant for instant printing on the terminal. This means that you \fISHOULD\fR follow these good practices :
+.br
+-> Print the result to the console as soon as you get it.
+.br
+-> Do not nest several
+.B prisma_dtoe()
+calls inside a single function call, such as
+.BR printf(3).
+.br
+This is because some obscure magic happens during a call to
+.B prisma_dtoe()
+, especially if
+.BR prisma_adapt(3)
+was called with PRISMA__ADAPT__CMD and indeed returned PRISMA__ADAPT__CMD.
+.PP
+That would mean prisma is adapted to Windows' cmd.exe, which doesn't support ANSI Escape Sequences.
+.br
+So what would
+.B prisma_dtoe()
+do in that case is :
+.br
+-> Call relevant WinAPI functions, to fake the escape sequence's effect;
+.br
+-> Return an empty string to prevent actual printing of weird characters.
+.SH RETURN VALUE
+A null-terminated string, using a character storage size of \fIchar_size\fR, and of maximum capacity PRISMA_ESCAPE_CAPACITY, which becomes invalid on a next call to
+.B prisma_dtoe().
+.SH ERRORS
+.B prisma_dtoe()
+returns NULL if \fIchar_size\fR is not 1, 2 or 4, or if \fIsrc\fR's value field is invalid or not supported.
+.br
+However, if prisma's current adaption is PRISMA__ADAPT__NOSUPPORT, an empty string is always immediately returned.
+.SH EXAMPLE
+.nf
+#include <stdlib.h>
+#include <stdio.h>
+#include <prisma.h>
+
+int main(void) {
+    struct PrismaEscapeData data;
+
+    /* You can omit the following line, however the result might be ugly. */
+    prisma_adapt(PRISMA__ADAPT__GUESS);
+
+    data.value = PRISMA__FG_RED;
+    printf("%sThis is the escape sequence for red foreground\\n", prismas_dtoe(data));
+    data.value = PRISMA__FG_EXTENDED;
+    data.r = 255;
+    data.g = 0;
+    data.b = 255;
+    printf("%sThis is the escape sequence for extended foreground", prismas_dtoe(data));
+    data.value = PRISMA__RESET;
+    printf("%s\\n", prismas_dtoe(data));
+    exit(EXIT_SUCCESS);
+}
+.fi
+.SH BUGS
+Bug reports should be sent to yoanlecoq.io@gmail.com.
+.SH COPYRIGHT
+prisma is released under the CC0 license.
+.br
+(see http://creativecommons.org/about/cc0)
+.br
+Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.
+.SH SEE ALSO
+.BR prisma_etod (3)

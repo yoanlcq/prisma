@@ -1,0 +1,113 @@
+prisma_dtoe(3)							prisma_dtoe(3)
+
+
+
+NAME
+       prisma_dtoe - Data to Escape Sequence
+
+SYNOPSIS
+       #include <prisma.h>
+
+       const void* prisma_dtoe(struct PrismaEscapeData src, size_t char_size);
+       const char* prismas_dtoe(struct PrismaEscapeData src);
+
+DESCRIPTION
+       prisma_dtoe()  generates  an escape sequence, using a character storage
+       size of char_size,  and	of  maximum  capacity  PRISMA_ESCAPE_CAPACITY.
+       Escape sequences can be interpreted with prisma_etod(3).
+
+       prismas_dtoe(src) is equivalent to prisma_dtoe(src, sizeof(char)).
+
+       prisma defines a structure to abstract an escape sequence's meaning and
+       data as follows :
+
+       struct PrismaEscapeData {
+	   int32_t value;  /* The escape sequence's meaning */
+	   uint8_t r;	   /* Optional red value */
+	   uint8_t g;	   /* Optional green value */
+	   uint8_t b;	   /* Optional blue value */
+	   int16_t n;	   /* Optional first informative value */
+	   int16_t m;	   /* Optional second informative value */
+	   uint8_t length; /* The escape sequence's total length as a string */
+       };
+
+       prisma_dtoe() refers to src's value field, and then, depending  on  it,
+       take  information  from	other  fields (except the length field, filled
+       only by prisma_etod(3) ).
+
+       Basically, one should refer to prisma.h to get an  exhaustive  list  of
+       the possible macros usable for a PrismaEscapeData's value field.
+
+       The  optional  r,  g,  and b fields are checked ONLY when relevant (i.e
+       when src's value field is PRISMA__BG_EXTENDED of PRISMA__FG_EXTENDED).
+       The optional n and m fields are reserved for escape sequences that need
+       to  store  information  unrelated  to  color (like x and y coordinates,
+       respectively, with PRISMA__CURSOR_POSITION).
+
+GOOD PRACTICES
+       prisma_dtoe() is meant for instant printing on the terminal. This means
+       that you SHOULD follow these good practices :
+       -> Print the result to the console as soon as you get it.
+       ->  Do  not  nest  several prisma_dtoe() calls inside a single function
+       call, such as printf(3).
+       This  is  because  some	obscure  magic	happens  during  a   call   to
+       prisma_dtoe()   ,   especially	if  prisma_adapt(3)  was  called  with
+       PRISMA__ADAPT__CMD and indeed returned PRISMA__ADAPT__CMD.
+
+       That would mean prisma is adapted to Windows'  cmd.exe,	which  doesn't
+       support ANSI Escape Sequences.
+       So what would prisma_dtoe() do in that case is :
+       ->  Call  relevant  WinAPI  functions,  to  fake  the escape sequence's
+       effect;
+       -> Return an empty string to prevent actual printing of	weird  charac‐
+       ters.
+
+RETURN VALUE
+       A  null-terminated string, using a character storage size of char_size,
+       and of maximum capacity PRISMA_ESCAPE_CAPACITY, which  becomes  invalid
+       on a next call to prisma_dtoe().
+
+ERRORS
+       prisma_dtoe()  returns  NULL if char_size is not 1, 2 or 4, or if src's
+       value field is invalid or not supported.
+       However, if prisma's current adaption is  PRISMA__ADAPT__NOSUPPORT,  an
+       empty string is always immediately returned.
+
+EXAMPLE
+       #include <stdlib.h>
+       #include <stdio.h>
+       #include <prisma.h>
+
+       int main(void) {
+	   struct PrismaEscapeData data;
+
+	   /* You can omit the following line, however the result might be ugly. */
+	   prisma_adapt(PRISMA__ADAPT__GUESS);
+
+	   data.value = PRISMA__FG_RED;
+	   printf("%sThis is the escape sequence for red foreground\n", prismas_dtoe(data));
+	   data.value = PRISMA__FG_EXTENDED;
+	   data.r = 255;
+	   data.g = 0;
+	   data.b = 255;
+	   printf("%sThis is the escape sequence for extended foreground", prismas_dtoe(data));
+	   data.value = PRISMA__RESET;
+	   printf("%s\n", prismas_dtoe(data));
+	   exit(EXIT_SUCCESS);
+       }
+
+BUGS
+       Bug reports should be sent to yoanlecoq.io@gmail.com.
+
+COPYRIGHT
+       prisma is released under the CC0 license.
+       (see http://creativecommons.org/about/cc0)
+       Anyone may freely build upon, enhance and reuse prisma for any purposes
+       without restriction under copyright or database law.
+
+SEE ALSO
+       prisma_etod(3)
+
+
+
+				  2014-12-25			prisma_dtoe(3)
