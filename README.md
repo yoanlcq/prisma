@@ -2,7 +2,7 @@
 
 A small C-library for playing with [ANSI escape sequences](http://en.wikipedia.org/wiki/ANSI_escape_code).
 
-prisma is released under the [CC0 license](see http://creativecommons.org/about/cc0).
+prisma is released under the [CC0 license](http://creativecommons.org/about/cc0).
 
 Anyone may freely build upon, enhance and reuse prisma for any 
 purposes without restriction under copyright or database law.
@@ -27,10 +27,10 @@ prisma also provides some funny functions to manipulate colors, convert them,
 and generate gradients.
 
 Applications that would make a great use of prisma would be :
--> Small chat widgets;
--> In-game command-lines;
--> Informative loading screens;
--> etc.
+* Small chat widgets;
+* In-game command-lines;
+* Informative loading screens;
+* etc.
 
 
 ## Installing
@@ -56,7 +56,7 @@ $ sudo make install
 ```
 For Windows users :
 ```powershell
-> <your_make_executable> install
+<your_make_executable> install
 ```
 But unlike in Unix systems, it doesn't actually install the library.
 You need to copy the files under `include/` to the appropriate folder in your 
