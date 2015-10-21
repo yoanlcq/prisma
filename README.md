@@ -39,19 +39,13 @@ Windows users will need something like TDM-GCC.
 
 In your command line, you should enter :
 ```bash
+$ make OS=<Your-OS-here> ARCH=<32-or-64-bits>
+```
+For linux users, this is also available :
+```bash
 $ sudo make install
 ```
-For Windows users :
-```powershell
-<your_make_executable> install
-```
-But unlike in Unix systems, it doesn't actually install the library.
-You need to copy the files under `include/` to the appropriate folder in your 
-project.
-Then, copy the generated `prisma.dll` you can retrieve under `lib/` and the 
-appropriate subfolders to the appropriate folder in your project. 
-Often, you should copy it to a `lib/` directory for compile-time, and to your executable's folder for run-time.
-
+This way you can install the library and get the man pages.
 
 ## Testing
 
