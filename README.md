@@ -1,16 +1,15 @@
 # prisma
 
-A small C-library for playing with [ANSI escape sequences](http://en.wikipedia.org/wiki/ANSI_escape_code).
+A small C library for playing with [ANSI escape sequences](http://en.wikipedia.org/wiki/ANSI_escape_code).
 
 prisma is released under the [CC0 license](http://creativecommons.org/about/cc0).
 
-Anyone may freely build upon, enhance and reuse prisma for any 
-purposes without restriction under copyright or database law.
-
+Please note that this is an unfinished project which goal was for me to learn how to create a library and document it.  
+Its code is old and not so well-thought.
 
 ## About
 
-prisma is a small C/C++ library, which allows easy Select Graphics Rendition 
+prisma is a small C library, which allows easy Select Graphics Rendition 
 (SGR) ANSI escape sequences generation and interpretation, with no other dependency than the C standard library.
 You may see it as a poor man's `ncurses`, except that it does not specifically target text interfaces.
 
@@ -38,18 +37,6 @@ Applications that would make a great use of prisma would be :
 You will need `make`, the GNU Compiler Collection and the GNU binutils.
 Windows users will need something like TDM-GCC.
 
-First, edit the `Makefile`, to set the first three variables to values that suit
- your needs.
-
-Example : I am currently under Linux 64 bits, and I want to build prisma for 
-use with C++ programs. This will be my Makefile's head :
-
-```Makefile
-OS = linux64
-LANG = CPP
-CC = g++
-```
-
 In your command line, you should enter :
 ```bash
 $ sudo make install
@@ -68,16 +55,13 @@ Often, you should copy it to a `lib/` directory for compile-time, and to your ex
 
 ## Testing
 
-Let's assume here you're using the C version of prisma.
-If you're using C++, you should use g++ instead of gcc.
-
 If prisma was installed :
 ```bash
 gcc examples/rainbow_demo.c -o rainbow_demo -lprisma
 ```
 If prisma was not installed :
 ```bash
-gcc examples/rainbow_demo.c -o rainbow_demo -Iinclude -Llib/<LANGUAGE>/<OS>/ -lprisma
+gcc examples/rainbow_demo.c -o rainbow_demo -Iinclude -Llib/<OS>/ -lprisma
 ```
 Windows users will need to make sure that `lib/<LANGUAGE>/<OS>/prisma.dll` is also in the executable's folder.
 

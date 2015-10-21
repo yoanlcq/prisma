@@ -1,10 +1,10 @@
 /*
-prisma is released under the CC0 license.
-(see http://creativecommons.org/about/cc0)
-Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.
-
-Bug reports with this unaltered source code should be sent to yoanlecoq.io@gmail.com
-*/
+ * prisma is released under the CC0 license.
+ * (see http://creativecommons.org/about/cc0)
+ * Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.
+ *
+ * Bug reports with this unaltered source code should be sent to yoanlecoq.io@gmail.com
+ */
 
 #ifndef _PRISMA_H
 #define _PRISMA_H

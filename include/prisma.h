@@ -1,10 +1,10 @@
 /*
-prisma is released under the CC0 license.
-(see http://creativecommons.org/about/cc0)
-Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.
-
-Bug reports with this unaltered source code should be sent to yoanlecoq.io@gmail.com
-*/
+ * prisma is released under the CC0 license.
+ * (see http://creativecommons.org/about/cc0)
+ * Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.
+ * 
+ * Bug reports with this unaltered source code should be sent to yoanlecoq.io@gmail.com
+ */
 
 #ifndef PRISMA_H
 #define PRISMA_H
@@ -88,7 +88,11 @@ struct PrismaEscapeData {
 #define prisma_gbyte(argb) (((argb) & 0x0000ff00)>>8)
 #define prisma_bbyte(argb)  ((argb) & 0x000000ff)
 
-#define prisma_bytestoargb(_a_, _r_, _g_, _b_) (((((unsigned char) _a_)<<24)&0xff000000)|((((unsigned char) _r_)<<16)&0xff0000)|((((unsigned char) _g_)<<8)&0xff00)|(((unsigned char)_b_)&0xff))
+#define prisma_bytestoargb(_a_, _r_, _g_, _b_) \
+    (((((uint8_t) _a_)<<24)&0xff000000) \
+    |((((uint8_t) _r_)<<16)&0xff0000) \
+    |((((uint8_t) _g_)<<8)&0xff00) \
+    | (((uint8_t) _b_)&0xff))
 void prisma_argbtobytes(uint32_t argb, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
 uint8_t  prisma_argbtoxterm(uint32_t argb);
 uint32_t prisma_xtermtoargb(uint8_t index);
@@ -119,13 +123,13 @@ int8_t prisma_adapt(int8_t adaptation);
 
 
 /* 
-  Datas to Escape String. 
+  Data to Escape String. 
   Returns a pointer to the generated ANSI escape sequence string, which data will be overriden on the next call. 
   If you need to store the result, then you should copy the pointer's data to an array of yours (by using, for instance, the memcpy() and strcpy() family of function).
   The pointers's data is of a maximum number of bytes defined by PRISMA_ESCAPE_CAPACITY.
   
-  If prisma is adapted to Window's cmd.exe (like after calling prisma_adapt(PRISMA__ADAPT__CMD)), then prisma_stoe() will immediately apply the expected visual result to the console and return an empty string.
-  This is because Windows's cmd.exe does not interpret ANSI Escape Sequences, but prisma_stoe() can still (and will) call specific WINAPI functions for it to behave like a regular escape sequence was printed.
+  If prisma is adapted to Window's cmd.exe (like after calling prisma_adapt(PRISMA__ADAPT__CMD)), then prisma_dtoe() will immediately apply the expected visual result to the console and return an empty string.
+  This is because Windows's cmd.exe does not interpret ANSI Escape Sequences, but prisma_dtoe() can still (and will) call specific WINAPI functions for it to behave like a regular escape sequence was printed.
 */
 const void* prisma_dtoe(struct PrismaEscapeData src, size_t char_size);
 #define prismas_dtoe(src) ((const char*) prisma_dtoe(src, sizeof(char)))
