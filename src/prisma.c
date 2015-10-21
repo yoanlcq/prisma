@@ -1,10 +1,11 @@
 /*
-prisma is released under the CC0 license.
-(see http://creativecommons.org/about/cc0)
-Anyone may freely build upon, enhance and reuse prisma for any purposes without restriction under copyright or database law.
-
-Bug reports with this unaltered source code should be sent to yoanlecoq.io@gmail.com
-*/
+ * prisma is released under the CC0 license.
+ * (see http://creativecommons.org/about/cc0)
+ * Anyone may freely build upon, enhance and reuse prisma for any 
+ * purposes without restriction under copyright or database law.
+ *
+ * Bug reports should be sent to yoanlecoq.io at gmail.com.
+ */
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -75,26 +76,23 @@ char* _prisma_trytogettermname() {
 #ifdef _PRISMA_LINUX 
     char *tmp = getnameof(getppidof(getsid(getpid())));
     if(tmp) {
-	strncpy(_prisma_termname, tmp, _PRISMA_TERMNAME_LENGTH);
-	if(strncmp(_prisma_termname, "initdline", _PRISMA_TERMNAME_LENGTH) == 0
-	   || strncmp(_prisma_termname, "konsole", _PRISMA_TERMNAME_LENGTH) == 0)  {
-	    return _prisma_termname;
-	}
+        strncpy(_prisma_termname, tmp, _PRISMA_TERMNAME_LENGTH);
+        if(!strncmp(_prisma_termname, "initdline", _PRISMA_TERMNAME_LENGTH)
+        || !strncmp(_prisma_termname, "konsole", _PRISMA_TERMNAME_LENGTH))
+            return _prisma_termname;
     } 
 
 #ifdef _GNU_SOURCE
-#ifndef __cplusplus
     strncpy(_prisma_termname, secure_getenv("TERM"), _PRISMA_TERMNAME_LENGTH);
-#endif
 #else
     strncpy(_prisma_termname, getenv("TERM"), _PRISMA_TERMNAME_LENGTH);
 #endif
 
 #elif defined _PRISMA_WINDOWS
-    if(GetConsoleOriginalTitleA(&_prisma_termname[9], _PRISMA_TERMNAME_LENGTH-9)) {
-	strncpy(_prisma_termname, "windows, ", 9);
-    }
-	else
+    if(GetConsoleOriginalTitleA(&_prisma_termname[9], 
+                _PRISMA_TERMNAME_LENGTH-9)) {
+    	strncpy(_prisma_termname, "windows, ", 9);
+    } else
 	    strncpy(_prisma_termname, "windows, unknown", _PRISMA_TERMNAME_LENGTH);
 #else
 	strncpy(_prisma_termname, "unknown", _PRISMA_TERMNAME_LENGTH);
@@ -106,102 +104,94 @@ char* _prisma_trytogettermname() {
 int8_t prisma_adapt(int8_t adaptation) {
     char *termname;
     if(adaptation==PRISMA__ADAPT__GUESS) {
-	termname = _prisma_trytogettermname();
-	if(strcmp(termname, "xterm") == 0)
-	    _prisma_adaptation = PRISMA__ADAPT__XTERM;
-	else if(strcmp(termname, "konsole") == 0)
-	    _prisma_adaptation = PRISMA__ADAPT__FULLSUPPORT;
-	else if(strcmp(termname, "linux") == 0 || strcmp(termname, "initdline") == 0)
-	    _prisma_adaptation = PRISMA__ADAPT__LINUXTTY;
-	else if(strncmp(termname, "windows", 7) == 0)
-	    _prisma_adaptation = PRISMA__ADAPT__CMD;
-	else _prisma_adaptation = PRISMA__ADAPT__NOSUPPORT;
+    	termname = _prisma_trytogettermname();
+        if(!strcmp(termname, "xterm"))
+            _prisma_adaptation = PRISMA__ADAPT__XTERM;
+        else if(!strcmp(termname, "konsole"))
+            _prisma_adaptation = PRISMA__ADAPT__FULLSUPPORT;
+        else if(!strcmp(termname, "linux")
+             || !strcmp(termname, "initdline"))
+            _prisma_adaptation = PRISMA__ADAPT__LINUXTTY;
+        else if(!strncmp(termname, "windows", 7))
+            _prisma_adaptation = PRISMA__ADAPT__CMD;
+        else _prisma_adaptation = PRISMA__ADAPT__NOSUPPORT;
     } else _prisma_adaptation = adaptation;
     return _prisma_adaptation;
 }
 
 void prisma_argbtobytes(uint32_t argb, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b) {
-    if(a!=NULL)
-	*a = prisma_abyte(argb);
-    if(r!=NULL)
-	*r = prisma_rbyte(argb);
-    if(g!=NULL)
-	*g = prisma_gbyte(argb);
-    if(b!=NULL)
-	*b = prisma_bbyte(argb);
+    if(a) *a = prisma_abyte(argb);
+    if(r) *r = prisma_rbyte(argb);
+    if(g) *g = prisma_gbyte(argb);
+    if(b) *b = prisma_bbyte(argb);
 }
 
 uint8_t prisma_argbto8color(uint32_t argb) {
     argb = ((argb&0xff0000)>=0x7f0000 ? 0xff0000 : 0 ) 
-	 | ((argb&0x00ff00)>=0x007f00 ? 0x00ff00 : 0 ) 
+         | ((argb&0x00ff00)>=0x007f00 ? 0x00ff00 : 0 ) 
          | ((argb&0x0000ff)>=0x00007f ? 0x0000ff : 0 );
     switch(argb) {
-    case 0x000000: return 0; break;
-    case 0xff0000: return 1; break;
-    case 0x00ff00: return 2; break;
-    case 0xffff00: return 3; break;
-    case 0x0000ff: return 4; break;
-    case 0xff00ff: return 5; break;
-    case 0x00ffff: return 6; break;
-    case 0xffffff: return 7; break;
+    case 0x000000: return 0;
+    case 0xff0000: return 1;
+    case 0x00ff00: return 2;
+    case 0xffff00: return 3;
+    case 0x0000ff: return 4;
+    case 0xff00ff: return 5;
+    case 0x00ffff: return 6;
+    case 0xffffff: return 7;
     }
 }
 
 uint32_t prisma_8colortoargb(uint8_t src) {
-    uint32_t argb;
     switch(src) {
-    case 0: argb = 0xff000000; break;
-    case 1: argb = 0xffff0000; break;
-    case 2: argb = 0xff00ff00; break;
-    case 3: argb = 0xffffff00; break;
-    case 4: argb = 0xff0000ff; break;
-    case 5: argb = 0xffff00ff; break;
-    case 6: argb = 0xff00ffff; break;
-    case 7: argb = 0xffffffff; break;
+    case 0: return 0xff000000;
+    case 1: return 0xffff0000;
+    case 2: return 0xff00ff00;
+    case 3: return 0xffffff00;
+    case 4: return 0xff0000ff;
+    case 5: return 0xffff00ff;
+    case 6: return 0xff00ffff;
+    case 7: return 0xffffffff;
+    default: return 0;
     }
-    return argb;
 }
 
 uint8_t prisma_argbtoxterm(uint32_t argb) {
     uint8_t r,g,b;
     prisma_argbtobytes(argb, NULL, &r, &g, &b);
     return ( 
-	(r>=0x04 && r<=0xf6 && r==g && g==b) 
-	? ( 232 + ((r-0x08)*24/0xee) )
-	: ( 16 + (36*(r/51)) + (6*(g/51)) + (b/51) )	
+	      (r>=0x04 && r<=0xf6 && r==g && g==b) 
+    	? ( 232 + ((r-0x08)*24/0xee) )
+	    : ( 16 + (36*(r/51)) + (6*(g/51)) + (b/51) )	
 	);
 }
-
-
-
-
 
 uint32_t prisma_xtermtoargb(uint8_t index) {
     uint32_t argb;
     if(index<8) {
-	argb = prisma_8colortoargb(index);
-	if(argb==0xffffffff)
-	    argb = 0xffc0c0c0;
-	else
-	    argb = 0xff000000 
-		| ((argb&0xff0000)!=0 ? 0x800000: 0) 
-		| ((argb&0x00ff00)!=0 ? 0x008000: 0) 
-		| ((argb&0x0000ff)!=0 ? 0x000080: 0);
+    	argb = prisma_8colortoargb(index);
+	    if(argb==0xffffffff)
+	        argb = 0xffc0c0c0;
+    	else
+	        argb = 0xff000000 
+		    | ((argb&0xff0000)!=0 ? 0x800000: 0) 
+    		| ((argb&0x00ff00)!=0 ? 0x008000: 0) 
+	    	| ((argb&0x0000ff)!=0 ? 0x000080: 0);
     } else if(index<16) {
-	index -= 8;
-	argb = prisma_8colortoargb(index);
-	if(argb==0)
-	    argb = 0xff808080;
+        index -= 8;
+        argb = prisma_8colortoargb(index);
+        if(argb==0)
+            argb = 0xff808080;
     } else if(index<232) {
-	index -= 16;
-	argb = 0xff000000 
-	    | ((51*(index/36))<<16) 
-	    | ((51*((index%36)/6))<<8) 
-	    | (51*(index%6));
+        index -= 16;
+        argb = 0xff000000 
+            | ((51*(index/36))<<16) 
+            | ((51*((index%36)/6))<<8) 
+            | (51*(index%6));
     } else {
-	index -= 232;
-	argb = (0x08+(10*index));
-	argb |= 0xff000000 | (argb<<16) | (argb<<8);
+        index -= 232;
+        argb = (0x08+(10*index));
+        argb |= 0xff000000 | (argb<<16) | (argb<<8);
     }
     return argb;
 }
@@ -216,84 +206,84 @@ struct PrismaEscapeData prisma_etod(const void* src_string, size_t char_size) {
     res.value = PRISMA__UNSUPPORTED;
 
     for(i=0 ; i<PRISMA_ESCAPE_CAPACITY ; i++) {
-	switch(char_size) {
-	case sizeof(uint8_t) : src[i] = ((const uint8_t*)  src_string)[i]; break;
-	case sizeof(uint16_t): src[i] = ((const uint16_t*) src_string)[i]; break;
-	case sizeof(uint32_t): src[i] = ((const uint32_t*) src_string)[i]; break;
-	default: return res; break;
-	}
-	if(i==1) {
-	    if(!(src[0]=='\033' && src[1]=='['))
-		return res;
-	    else continue;
-	}
-	if(src[i] == '\0' || (src[i] >= '@' && src[i] <= '~')) {
-	    res.length = i+1;
-	    break;
-	}
+        switch(char_size) {
+        case 1: src[i] = ((const uint8_t*)  src_string)[i]; break;
+        case 2: src[i] = ((const uint16_t*) src_string)[i]; break;
+        case 4: src[i] = ((const uint32_t*) src_string)[i]; break;
+        default: return res; break;
+        }
+        if(i==1) {
+            if(!(src[0]=='\033' && src[1]=='['))
+                return res;
+            else continue;
+        }
+        if(src[i] == '\0' || (src[i] >= '@' && src[i] <= '~')) {
+            res.length = i+1;
+            break;
+        }
     }
     if(i>=PRISMA_ESCAPE_CAPACITY) {
-	res.length = PRISMA_ESCAPE_CAPACITY;
-	return res;
+        res.length = PRISMA_ESCAPE_CAPACITY;
+        return res;
     }
     
     memset(tmp, 0, 4*sizeof(char));
     memset(stock, 0, 6*sizeof(int32_t));
     for(p=0, k=0, i=2 ; i<res.length && k<5 && p<4; i++) {
-	switch(src[i]) {
-	case ';': 
-	    stock[k] = atoi(tmp);
-	    p=0;
-	    k++;
-	    memset(tmp, 0, 4*sizeof(char));
-	    break;
-	case '0':
-	case '1':
-	case '2': 
-	case '3': 
-	case '4': 
-	case '5': 
-	case '6': 
-	case '7': 
-	case '8': 
-	case '9': 
-	    tmp[p] = (char) src[i];
-	    p++;
-	    break;
-	default: 
-	    stock[k] = atoi(tmp);
-	    p=-1; 
-	    break;
-	}
-	if(p==-1)
-	    break;
+        switch(src[i]) {
+        case ';': 
+            stock[k] = atoi(tmp);
+            p=0;
+            k++;
+            memset(tmp, 0, 4*sizeof(char));
+            break;
+        case '0':
+        case '1':
+        case '2': 
+        case '3': 
+        case '4': 
+        case '5': 
+        case '6': 
+        case '7': 
+        case '8': 
+        case '9': 
+            tmp[p] = (char) src[i];
+            p++;
+            break;
+        default: 
+            stock[k] = atoi(tmp);
+            p=-1; 
+            break;
+        }
+        if(p==-1)
+            break;
     }
     
     switch(src[i]) {
     case 'm': 
-	res.value = stock[0];
-	if(res.value == PRISMA__FG_EXTENDED 
-	   || res.value == PRISMA__BG_EXTENDED) {
-	    switch(stock[1]) {
-	    case 2: 
-		res.r = stock[2];
-		res.g = stock[3];
-		res.b = stock[4];
-		break;
-	    case 5: 
-		prisma_argbtobytes(prisma_xtermtoargb(stock[2]), NULL, &res.r, &res.g, &res.b);
-		break;
-	    }
-	}
-	break;
+        res.value = stock[0];
+        if(res.value == PRISMA__FG_EXTENDED 
+           || res.value == PRISMA__BG_EXTENDED) {
+            switch(stock[1]) {
+            case 2: 
+                res.r = stock[2];
+                res.g = stock[3];
+                res.b = stock[4];
+                break;
+            case 5: 
+                prisma_argbtobytes(prisma_xtermtoargb(stock[2]), NULL, &res.r, &res.g, &res.b);
+            break;
+            }
+        }
+        break;
     case 'J': 
-	res.value = stock[0]+_PRISMA__CLEAR__FIRST;
-	break;
+        res.value = stock[0]+_PRISMA__CLEAR__FIRST;
+        break;
     case 'H': 
-	res.value = PRISMA__CURSOR_POSITION;
-	res.n = stock[0] > 0 ? stock[0] : 1;
-	res.m = stock[1] > 0 ? stock[1] : 1;
-	break;
+        res.value = PRISMA__CURSOR_POSITION;
+        res.n = stock[0] > 0 ? stock[0] : 1;
+        res.m = stock[1] > 0 ? stock[1] : 1;
+        break;
     }
     return res;
 }

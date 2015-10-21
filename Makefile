@@ -1,61 +1,91 @@
-#OS can be set to win32, win64, macosx, linux32 or linux64.
-#It should be set to the platform you're compiling on.
-OS = win32
-#LANG can be set to C or CPP.
-LANG = CPP
-#CC must be set to the appropriate compiler (gcc, or g++).
-CC = g++
+define OS_ARCH_ERROR
 
+
+OS and ARCH are not defined. 
+Please set them on the command line when calling make,
+with one of the following values :
+
+OS = windows | linux | osx
+ARCH = 32 | 64 (don't specify for osx)
+
+Like so : 
+	    make OS=linux ARCH=64
+
+
+endef
+
+ifndef OS
+$(error $(call OS_ARCH_ERROR))
+endif
+
+ifneq ($(OS),osx)
+ifndef ARCH
+$(error $(call OS_ARCH_ERROR))
+endif
+endif
+
+ifndef ARCH
+ARCH=
+endif
+
+CC = gcc
 
 CCFLAGS = -Iinclude -O3
+ifneq ($(ARCH),)
+CCFLAGS += -m$(ARCH)
+endif
 LDFLAGS = 
 LDLIBS = -lm
-OFILES = build/$(LANG)/$(OS)/prisma.o
+BUILDDIR=build/$(OS)$(ARCH)
+LIBDIR=lib/$(OS)$(ARCH)
+OFILES = $(BUILDDIR)/prisma.o
 CLEAN = rm -f $(OFILES)
-CLEAN_WINDOWS = del /f /q build\$(LANG)\$(OS)\*
+CLEAN_WINDOWS = del /f /q build\$(OS)$(ARCH)\*
+MKDIR=mkdir
+ifneq ($(OS),windows)
+MKDIR += -p
+endif
 
 INSTALL =
 
-COMMAND_WINDOWS = $(CC) $(CCFLAGS) -shared -o lib/$(LANG)/$(OS)/prisma.dll build/$(LANG)/$(OS)/prisma.o $(LDFLAGS) $(LDLIBS)
+COMMAND_WINDOWS = $(CC) $(CCFLAGS) -shared -o $(LIBDIR)/prisma.dll $(BUILDDIR)/prisma.o $(LDFLAGS) $(LDLIBS)
 
-ifeq ($(OS), win32)
-    CCFLAGS += -m32 -DBUILD_DLL
+
+ifeq ($(OS),windows)
+    CCFLAGS += -DBUILD_DLL
     COMMAND = $(COMMAND_WINDOWS)
     CLEAN = $(CLEAN_WINDOWS)
 endif
 
-ifeq ($(OS), win64)
-    CCFLAGS += -m64 -DBUILD_DLL
-    COMMAND = $(COMMAND_WINDOWS)
-    CLEAN = $(CLEAN_WINDOWS)
+
+COMMAND_LINUX = $(CC) $(CCFLAGS) -shared $(BUILDDIR)/prisma.o -Wl,-soname,libprisma.so -o $(LIBDIR)/libprisma.so $(LDFLAGS) $(LDLIBS)
+
+INSTALL_LINUX = cp $(LIBDIR)/libprisma.so /usr/local/lib/; ldconfig; cp include/* /usr/local/include; cp -pR doc/man? /usr/local/share/man/; mandb
+
+ifeq ($(OS),linux)
+    CCFLAGS += -fPIC
+    COMMAND = $(COMMAND_LINUX)
+    INSTALL = $(INSTALL_LINUX)
 endif
 
-COMMAND_LINUX = $(CC) $(CCFLAGS) -shared build/$(LANG)/$(OS)/prisma.o -Wl,-soname,libprisma.so -o lib/$(LANG)/$(OS)/libprisma.so $(LDFLAGS) $(LDLIBS)
-INSTALL_LINUX = cp ./lib/$(LANG)/$(OS)/libprisma.so /usr/local/lib/; ldconfig; cp ./include/* /usr/local/include; cp -pR doc/man? /usr/local/share/man/; mandb
-
-ifeq ($(OS), macosx)
+ifeq ($(OS),osx)
     CCFLAGS += -fPIC
     COMMAND = $(COMMAND_LINUX) -dynamiclib -flat_namespace
     INSTALL = $(INSTALL_LINUX)
 endif
 
-ifeq ($(OS), linux32)
-    CCFLAGS += -m32 -fPIC
-    COMMAND = $(COMMAND_LINUX)
-    INSTALL = $(INSTALL_LINUX)
-endif
-
-ifeq ($(OS), linux64)
-    CCFLAGS += -m64 -fPIC
-    COMMAND = $(COMMAND_LINUX)
-    INSTALL = $(INSTALL_LINUX)
-endif
-
-all : build/$(LANG)/$(OS)/prisma.o
+all : $(BUILDDIR) $(LIBDIR) $(BUILDDIR)/prisma.o
 	$(COMMAND)
 
-build/$(LANG)/$(OS)/prisma.o : src/prisma.c include/prisma.h include/_prisma.h
-	$(CC) $(CCFLAGS) -c src/prisma.c -o build/$(LANG)/$(OS)/prisma.o
+$(BUILDDIR) :
+	$(MKDIR) $(BUILDDIR)
+
+$(LIBDIR) :
+	$(MKDIR) $(LIBDIR)
+
+
+$(BUILDDIR)/prisma.o : src/prisma.c include/prisma.h include/_prisma.h
+	$(CC) $(CCFLAGS) -c src/prisma.c -o $(BUILDDIR)/prisma.o
 
 install : all
 	$(INSTALL)
