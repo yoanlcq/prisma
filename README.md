@@ -1,11 +1,16 @@
 # prisma
 
-A small C library for playing with [ANSI escape sequences](http://en.wikipedia.org/wiki/ANSI_escape_code).
+A small C library for playing with [ANSI escape sequences](http://en.wikipedia.org/wiki/ANSI_escape_code).  
+It comes with a man page.  
 
 prisma is released under the [CC0 license](http://creativecommons.org/about/cc0).
 
 Please note that this is an unfinished project which goal was for me to learn how to create a library and document it.  
 Its code is old and not so well-thought.
+
+![Demo Screenshot](http://yoanlecoq.com/dl/dev/prisma/pr_rainbow.png)
+![Man page](http://yoanlecoq.com/dl/dev/prisma/pr_man.png)
+
 
 ## About
 
